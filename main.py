@@ -1,11 +1,11 @@
 import sys
-#from pandas.tests.io.excel.test_openpyxl import openpyxl
+from pandas.tests.io.excel.test_openpyxl import openpyxl
 from flight import *
 from plane import *
-#from selenium import webdriver
+from selenium import webdriver
 import pandas as pd
 import numpy as numpy
-#from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup
 import csv
 
 
