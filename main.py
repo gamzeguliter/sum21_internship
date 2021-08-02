@@ -72,10 +72,21 @@ pass
 
 
 def schedule_flights(args,args2):
-        for a in args:
-            print(a.name)
-        for a in args2:
-            print(a.name)
+    hour = 0
+    counter = 0;
+
+    while hour < 24:
+        minute = 0
+        while minute < 60:
+
+            minute = minute + 1
+            counter = counter + 1
+
+        hour = hour + 1
+
+
+    print(counter)
+
 pass
 
 
