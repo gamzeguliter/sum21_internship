@@ -225,7 +225,6 @@ Image(graph.create_png())
 
 
 
-
 """"
 elastic=ElasticNet(alpha=0.5, l1_ratio=0.1, fit_intercept=True, normalize=False, precompute=False, max_iter=1000, copy_X=True, tol=0.0001, warm_start=False, positive=False, random_state=None,).fit(X_train,y_train)
 y_pred = elastic.predict(X_test)
