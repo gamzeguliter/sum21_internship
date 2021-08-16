@@ -14,6 +14,7 @@ from plane import *
 from selenium import webdriver
 import pandas as pd
 import numpy as numpy
+import fileinput
 from bs4 import BeautifulSoup
 from datetime import datetime
 import csv
@@ -40,26 +41,50 @@ except ImportError:
     import Tkinter as tk     # python 2
     import tkFont as tkfont  # python 2
 
+
+
+
+# code
+####################################################################################
 # variables
 Planes = []
 Flights = []
 printOut = []
 Days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 count = 0
-aglıcam ="jfdks"
 
-
-# code
-####################################################################################
-df = pd.read_excel(r'C:\Users\User\Desktop\havelsan\Bookings.xlsx', sheet_name='Bookings')
-df = df.fillna('')
-numpy.set_printoptions(threshold=sys.maxsize)
-airports = df['AIRPORT']
-#print(airports)
-#########################################################################################
 
 print("\n")
 
+
+
+"""
+numpy.random.seed(0)
+arrayTemp = numpy.random.normal(size = 60, loc = 60, scale =30)
+df = pd.read_csv("test.csv")
+delayCol = 0
+
+while delayCol < 60:
+    df.loc[delayCol, 'delay amount'] = arrayTemp[delayCol]
+    delayCol = delayCol + 1
+
+df.to_csv("test.csv", index=False)
+
+
+numpy.random.seed(0)
+arrayTemp2 = numpy.random.normal(size = 60, loc = 10000, scale =5000)
+
+df = pd.read_csv("test.csv")
+rentCol = 0
+
+while rentCol < 60:
+    df.loc[rentCol, 'rental price'] = arrayTemp2[rentCol]
+    rentCol = rentCol + 1
+
+df.to_csv("test.csv", index=False)
+"""
+
+count = 0
 with open('flight.csv', 'r') as file:
     reader = csv.reader(file)
     for row in reader:
@@ -68,12 +93,7 @@ with open('flight.csv', 'r') as file:
             tempFlight = flight(row[0], row[2], row[1], row[3], row[4], None, row[5], row[6])
             Flights.append(tempFlight)
 
-i = 0
-while i < count - 1:
-    #print(Flights[i].name, Flights[i].leavingPlace, Flights[i].leavingTime, Flights[i].leavingDay,
-          #Flights[i].arrivalPlace,
-          #Flights[i].arrivalTime, Flights[i].arrivalDay)
-    i = i + 1
+
 
 def change_to_hours(number):
     temp = numpy.fix(number)
@@ -185,9 +205,8 @@ test.columns = col_names
 feature_cols = ['place','backup plane','delay amount','rental price']
 X = test[feature_cols] # Features
 y = test.label # Target variable
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
-"""""
 clf = DecisionTreeClassifier(criterion="gini",min_samples_split=10,max_depth=3)
 clf = clf.fit(X_train,y_train)
 
@@ -204,7 +223,9 @@ graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
 graph.write_png('test.png')
 Image(graph.create_png())
 
-"""""
+
+
+
 """"
 elastic=ElasticNet(alpha=0.5, l1_ratio=0.1, fit_intercept=True, normalize=False, precompute=False, max_iter=1000, copy_X=True, tol=0.0001, warm_start=False, positive=False, random_state=None,).fit(X_train,y_train)
 y_pred = elastic.predict(X_test)
@@ -249,14 +270,13 @@ plt.show()
 """""
 
 
-class SampleApp(tk.Tk):
+class App(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
         self._frame = None
         self.switch_frame(StartPage)
 
     def switch_frame(self, frame_class):
-        """Destroys current frame and replaces it with a new one."""
         new_frame = frame_class(self)
         if self._frame is not None:
             self._frame.destroy()
@@ -416,7 +436,7 @@ class PageTwo(tk.Frame):
 
 
 if __name__ == "__main__":
-    app = SampleApp()
+    app = App()
     app.mainloop()
 
 
