@@ -9,4 +9,4 @@ class flight:
         self.leavingTime = leavingTime
         self.arrivalPlace = arrivalPlace
         self.leavingPlace = leavingPlace
-        pass
+

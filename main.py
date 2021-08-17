@@ -3,7 +3,6 @@ import sys
 from tkinter.ttk import Combobox
 from tkinter import ttk
 from tkinter.ttk import *
-
 from PIL import ImageTk
 from pandas.tests.io.excel.test_openpyxl import openpyxl
 from sklearn.linear_model import ElasticNet, ElasticNetCV
@@ -427,12 +426,6 @@ class PageTwo(tk.Frame):
         button_schedule.pack(pady=30)
 
         frame2.pack(fill=tk.BOTH, side=tk.BOTTOM, expand=True)
-
-
-
-
-
-
 
 if __name__ == "__main__":
     app = App()
