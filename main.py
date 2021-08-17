@@ -3,18 +3,14 @@ import sys
 from tkinter.ttk import Combobox
 from tkinter import ttk
 from tkinter.ttk import *
-from PIL import ImageTk
-from pandas.tests.io.excel.test_openpyxl import openpyxl
 from sklearn.linear_model import ElasticNet, ElasticNetCV
 from sklearn.metrics import roc_auc_score, mean_squared_error
 from sklearn.model_selection import train_test_split
 from flight import *
 from plane import *
-from selenium import webdriver
 import pandas as pd
 import numpy as numpy
 import fileinput
-from bs4 import BeautifulSoup
 from datetime import datetime
 import csv
 import tkinter as tk
@@ -22,8 +18,6 @@ from tkinter import *
 from sklearn import tree
 import pydotplus
 from sklearn.tree import DecisionTreeClassifier, export_graphviz
-import matplotlib.pyplot as plt
-import matplotlib.image as pltimg
 from sklearn.tree import export_graphviz
 from IPython.display import Image
 import pydotplus
@@ -215,6 +209,7 @@ print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
 
 y_pred = clf.predict(X_test)
 dot_data = StringIO()
+
 export_graphviz(clf, out_file=dot_data,
                 filled=True, rounded=True,
                 special_characters=True,feature_names = feature_cols,class_names=['0','1','2','3'])
