@@ -25,14 +25,16 @@ from sklearn import metrics
 from sklearn.ensemble import BaggingClassifier, RandomForestClassifier
 import six
 import sys
+import matplotlib.pyplot as plot
 sys.modules['sklearn.externals.six'] = six
 from sklearn.externals.six import StringIO
+
 try:
-    import tkinter as tk                # python 3
-    from tkinter import font as tkfont  # python 3
+    import tkinter as tk
+    from tkinter import font as tkfont
 except ImportError:
-    import Tkinter as tk     # python 2
-    import tkFont as tkfont  # python 2
+    import Tkinter as tk
+    import tkFont as tkfont
 
 
 
@@ -46,7 +48,7 @@ planeFlightHours = []
 Days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 count = 0
 totalFlightHours = 0
-i = 0
+flightPercentege = 0
 
 
 """
@@ -100,11 +102,10 @@ def assign_flight(plane, flight):
     plane.flight = flight
     flight.plane = plane
     plane.place = flight.arrivalPlace
+    plane.flightHour = 2 + plane.flightHour + addToTotalFlightHour(float(flight.leavingTime),float(flight.arrivalTime))
     plane.available = 0
     Planes.remove(plane)
     Planes.append(plane)
-    plane.flightHour = plane.flightHour + addToTotalFlightHour(float(flight.leavingTime),float(flight.arrivalTime))
-
 pass
 
 
@@ -127,6 +128,7 @@ def create_randomPlanes(planeCount):
         p = plane("p" + str(i), 1, None, "IST", 0,"IST",0,i)
         Planes.append(p)
         i = i + 1
+    return i
 pass
 
 def addToTotalFlightHour(leave,arrive):
@@ -202,8 +204,18 @@ def schedule_flights(args, args2):
         tempString = "-----------------------------------------------------------------------------------------------------------------"
         printOut.append(tempString)
     for p in Planes:
-        print(p.name," => ", p.flightHour)
+        print(p.name," => ", p.flightHour,"minutes of flight")
+
+    calculatePercentage = 0
+    print("------------------------------------------------------------------------------------------------------------------")
+    for p in Planes:
+        print(p.name,"---flight percentage---" ,(int(p.flightHour))*100/totalFlightHours)
+        calculatePercentage = calculatePercentage + (int(p.flightHour))*100/totalFlightHours
+
+
+    return calculatePercentage
 pass
+
 
 
 # load data to decision tree
@@ -226,7 +238,6 @@ print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
 
 y_pred = clf.predict(X_test)
 dot_data = StringIO()
-
 
 # Note: graphviz is not working in company pc
 """""
@@ -312,16 +323,16 @@ class StartPage(tk.Frame):
         button = tk.Button(self, text="Main Page",fg="white",bg="DodgerBlue4", width= 10,height=2,font=("Courier",16,"italic"),
                   command=lambda: master.switch_frame(PageTwo)).pack()
 
-def combine_funcs(*funcs):
-    def combined_func(*args, **kwargs):
-        for f in funcs:
-            f(*args, **kwargs)
-    return combined_func
+
 
 class PageOne(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master)
-        schedule_flights(Flights, Planes)
+        flightPercentege = schedule_flights(Flights, Planes)
+        planeCount = 0
+        for p in Planes:
+            planeCount = planeCount + 1
+        print("Average percentage of flight : ", float(round(flightPercentege/planeCount,2)))
 
 
         frame3 = tk.Frame(master=self, width=100,height=300, bg="red4")
@@ -410,10 +421,10 @@ class PageTwo(tk.Frame):
         plane_box = Entry(frame2)
         plane_box.place(x=600, y=150)
 
+
         def retrieve_input():
             inputValue = int(plane_box.get())
             create_randomPlanes(inputValue)
-
 
         plane_label = tk.Label(
             master=frame2,
@@ -445,7 +456,6 @@ class PageTwo(tk.Frame):
 
 if __name__ == "__main__":
 
-
     count = 0
     with open('flight.csv', 'r') as file:
         reader = csv.reader(file)
@@ -459,8 +469,19 @@ if __name__ == "__main__":
 
     print("TOTAL FLIGHT AMOUNT OF THE WEEK : ",totalFlightHours)
     print("TOTAL FLIGHT AMOUNT OF THE WEEK : ",float(round(finalResultHour)),"hours",finalResultMin,"minutes")
+    # plot here
+    x1 = [2, 5, 10, 15, 20]
+    y1 = [22.49, 16.33, 9.63, 6.73, 5.77]
+    # plotting the line 1 points
+    plot.plot(x1, y1, label="avg flight time")
+
+    plot.xlabel('Num. of planes')
+    plot.ylabel('Avg flight time')
+    plot.title('Number of Planes Used vs Avg Flight Time Plot')
+    plot.show()
 
     app = App()
     app.mainloop()
+
 
 
