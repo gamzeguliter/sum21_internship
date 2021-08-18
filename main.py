@@ -231,8 +231,14 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 clf = DecisionTreeClassifier(criterion="gini",min_samples_split=10,max_depth=3)
 clf = clf.fit(X_train,y_train)
+#######################################################################################COME BAAAAAAAAAAACCCCCCCCCCKKKKKKKKKK###########
+testtt = [2,3,4,5]
+testtt2 = [1,0,80,12859]
+arrayf =[testtt]
+y_pred2 = clf.predict(arrayf)
+print(y_pred2)
 
-
+#######################################################################################COME BAAAAAAAAAAACCCCCCCCCCKKKKKKKKKK###########
 y_pred = clf.predict(X_test)
 print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
 
