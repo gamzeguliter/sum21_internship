@@ -37,18 +37,16 @@ except ImportError:
 
 
 
-# code
-####################################################################################
-# variables
-Planes = []
+#################################  CODE  #######################################################
+inputValue = 0
+Planes  = []
 Flights = []
 printOut = []
+planeFlightHours = []
 Days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 count = 0
-
-
-print("\n")
-
+totalFlightHours = 0
+i = 0
 
 
 """
@@ -87,7 +85,6 @@ with open('flight.csv', 'r') as file:
             Flights.append(tempFlight)
 
 
-
 def change_to_hours(number):
     temp = numpy.fix(number)
     temp2 = number - temp
@@ -106,6 +103,8 @@ def assign_flight(plane, flight):
     plane.available = 0
     Planes.remove(plane)
     Planes.append(plane)
+    plane.flightHour = plane.flightHour + addToTotalFlightHour(float(flight.leavingTime),float(flight.arrivalTime))
+
 pass
 
 
@@ -125,10 +124,30 @@ pass
 def create_randomPlanes(planeCount):
     i = 0
     while i < planeCount:
-        p = plane("p" + str(i), 1, None, "IST", 0,"IST",0)
+        p = plane("p" + str(i), 1, None, "IST", 0,"IST",0,i)
         Planes.append(p)
         i = i + 1
 pass
+
+def addToTotalFlightHour(leave,arrive):
+    number_dec = leave % 1
+    number_dec2 = arrive % 1
+    number_dec = round(float(number_dec), 2)
+    number_dec2 = round(float(number_dec2), 2)
+    number = int(leave)
+    number2 = int(arrive)
+
+    minutes = number * 60 + number_dec*100
+    minutes2 = number2 * 60 + number_dec2 * 100
+
+    if(arrive > leave):
+        totalFlightHours = (minutes2 - minutes)
+
+    else:
+        totalFlightHours = (24 * 60) -  minutes + minutes2
+
+
+    return totalFlightHours
 
 
 def schedule_flights(args, args2):
@@ -182,22 +201,20 @@ def schedule_flights(args, args2):
             hour = hour + 1
         tempString = "-----------------------------------------------------------------------------------------------------------------"
         printOut.append(tempString)
+    for p in Planes:
+        print(p.name," => ", p.flightHour)
 pass
 
+
+# load data to decision tree
 data = pd.read_csv("test.csv")
-# load dataset
-
 col_names = ['place','backup plane','delay amount','rental price','label']
-# load dataset
-
 test = pd.read_csv("test.csv")
-
 test.columns = col_names
-
 
 feature_cols = ['place','backup plane','delay amount','rental price']
 X = test[feature_cols] # Features
-y = test.label # Target variable
+y = test.label         # Target label
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
 clf = DecisionTreeClassifier(criterion="gini",min_samples_split=10,max_depth=3)
@@ -210,6 +227,9 @@ print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
 y_pred = clf.predict(X_test)
 dot_data = StringIO()
 
+
+# Note: graphviz is not working in company pc
+"""""
 export_graphviz(clf, out_file=dot_data,
                 filled=True, rounded=True,
                 special_characters=True,feature_names = feature_cols,class_names=['0','1','2','3'])
@@ -217,7 +237,7 @@ graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
 graph.write_png('test.png')
 Image(graph.create_png())
 
-
+"""""
 
 """"
 elastic=ElasticNet(alpha=0.5, l1_ratio=0.1, fit_intercept=True, normalize=False, precompute=False, max_iter=1000, copy_X=True, tol=0.0001, warm_start=False, positive=False, random_state=None,).fit(X_train,y_train)
@@ -394,6 +414,7 @@ class PageTwo(tk.Frame):
             inputValue = int(plane_box.get())
             create_randomPlanes(inputValue)
 
+
         plane_label = tk.Label(
             master=frame2,
             text="Please enter the number of planes.",
@@ -423,6 +444,22 @@ class PageTwo(tk.Frame):
         frame2.pack(fill=tk.BOTH, side=tk.BOTTOM, expand=True)
 
 if __name__ == "__main__":
+
+
+    count = 0
+    with open('flight.csv', 'r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            count = count + 1
+            if count != 1:
+                totalFlightHours = totalFlightHours + addToTotalFlightHour(float(row[1]),float(row[2]))
+
+    finalResultHour = totalFlightHours / 60
+    finalResultMin = totalFlightHours % 60
+
+    print("TOTAL FLIGHT AMOUNT OF THE WEEK : ",totalFlightHours)
+    print("TOTAL FLIGHT AMOUNT OF THE WEEK : ",float(round(finalResultHour)),"hours",finalResultMin,"minutes")
+
     app = App()
     app.mainloop()
 
