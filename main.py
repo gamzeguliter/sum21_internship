@@ -424,13 +424,10 @@ class PageOne(tk.Frame):
             #place,backup plane,delay amount,rental price,label
             if(cb2.get() == "yes"):
                 back_up_plane = 1
-                print("hi")
             else :
-
                 back_up_plane = 0
 
             if(cb3.get() == "yes"):
-                print("hi")
                 back_up_plane2 = 1
             else :
                 back_up_plane2 = 0
@@ -483,7 +480,6 @@ class PageOne(tk.Frame):
             graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
             graph.write_png('test.png')
             Image(graph.create_png())
-
 
             B1.pack()
             popup.mainloop
