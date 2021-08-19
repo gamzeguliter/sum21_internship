@@ -1,28 +1,13 @@
-import math
-import sys
-from tkinter.ttk import Combobox
 from tkinter import ttk
 from tkinter.ttk import *
-from sklearn.linear_model import ElasticNet, ElasticNetCV
-from sklearn.metrics import roc_auc_score, mean_squared_error
 from sklearn.model_selection import train_test_split
 from flight import *
 from plane import *
 import pandas as pd
-import numpy as numpy
-import fileinput
-from datetime import datetime
 import csv
-import tkinter as tk
 from tkinter import *
-from sklearn import tree
-import pydotplus
-from sklearn.tree import DecisionTreeClassifier, export_graphviz
-from sklearn.tree import export_graphviz
-from IPython.display import Image
-import pydotplus
 from sklearn import metrics
-from sklearn.ensemble import BaggingClassifier, RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier, export_graphviz
 import six
 import sys
 import matplotlib.pyplot as plot
@@ -34,19 +19,32 @@ try:
 except ImportError:
     import Tkinter as tk
     import tkFont as tkfont
-
+import numpy as numpy
+import fileinput
+from datetime import datetime
+from sklearn.linear_model import ElasticNet, ElasticNetCV
+from sklearn.metrics import roc_auc_score, mean_squared_error
+import tkinter as tk
+from sklearn import tree
+import pydotplus
+from sklearn.tree import export_graphviz
+from IPython.display import Image
+import pydotplus
+import math
+import sys
+from tkinter.ttk import Combobox
+from sklearn.ensemble import BaggingClassifier, RandomForestClassifier
 #################################  CODE  ################################################################################
 
 #global variables
 inputValue = 0
-Planes  = []
-Flights = []
+Planes  = [] #array of planes in the simulation
+Flights = [] #aray of flights in the simulation
 printOut = []
-planeFlightHours = []
 Days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 count = 0
 totalFlightHours = 0
-flightPercentege = 0
+flightPercentage = 0
 
 #below commented code is to assign random values to the parameters in test.csv by using Gaussian Distribution
 """
@@ -305,22 +303,22 @@ class StartPage(tk.Frame):
 
 
 
-#Flight schedule page of the simulation
+
 """"
+Flight schedule page of the simulation
 Notes: 
 - The Page1 frame consists of 2 other sub-frames (Frame3 and Frame4)
-
 """""
 class PageOne(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master)
-        flightPercentege = schedule_flights(Flights, Planes)
+        flightPercentage = schedule_flights(Flights, Planes)
         planeCount = 0
 
         #calculate avg percentage of fligts for each plane
         for p in Planes:
             planeCount = planeCount + 1
-        print("Average percentage of flight : ", float(round(flightPercentege/planeCount,2)))
+        print("Average percentage of flight : ", float(round(flightPercentage/planeCount,2)))
 
         #create sub-frames
         frame3 = tk.Frame(master=self, width=100,height=300, bg="red4")
@@ -457,13 +455,13 @@ class PageOne(tk.Frame):
             clf = DecisionTreeClassifier(criterion="gini", min_samples_split=10, max_depth=3)
             clf = clf.fit(X_train, y_train)
 
+            y_pred = clf.predict(X_test)
             print("######################################################################################","\n")
-            print("Accuracy of the decision treebased on the training and test data:", metrics.accuracy_score(y_test, y_pred))
+            print("Accuracy of the decision tree based on the training and test data:", metrics.accuracy_score(y_test, y_pred))
             print("######################################################################################","\n")
 
             arrayf = [dataTotest]
             y_pred2 = clf.predict(arrayf)
-            y_pred = clf.predict(X_test)
             print(y_pred2)
             solutionLabel = y_pred2[0]
             solution = " hi"
@@ -505,12 +503,13 @@ class PageOne(tk.Frame):
         frame3.pack(fill=tk.BOTH, expand=True)
         frame4.pack(fill=tk.BOTH, expand=True)
 
-# Main Page of the simulation where the user indicates the number of planes in the simulation
+
+
 
 """"
+Main Page of the simulation where the user indicates the number of planes in the simulation
 Notes: 
 - The Page2 frame consists of 2 other sub-frames (Frame2 and Frame1)
-
 """""
 class PageTwo(tk.Frame):
     def __init__(self, master):
