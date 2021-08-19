@@ -12,10 +12,8 @@ from sklearn.tree import DecisionTreeClassifier, export_graphviz
 import six
 import sys
 import matplotlib.pyplot as plot
-
 sys.modules['sklearn.externals.six'] = six
 from sklearn.externals.six import StringIO
-
 try:
     import tkinter as tk
     from tkinter import font as tkfont
