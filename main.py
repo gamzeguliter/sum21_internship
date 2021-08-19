@@ -28,7 +28,6 @@ import sys
 import matplotlib.pyplot as plot
 sys.modules['sklearn.externals.six'] = six
 from sklearn.externals.six import StringIO
-
 try:
     import tkinter as tk
     from tkinter import font as tkfont
@@ -36,10 +35,9 @@ except ImportError:
     import Tkinter as tk
     import tkFont as tkfont
 
+#################################  CODE  ################################################################################
 
-
-
-#################################  CODE  #######################################################
+#global variables
 inputValue = 0
 Planes  = []
 Flights = []
@@ -50,7 +48,7 @@ count = 0
 totalFlightHours = 0
 flightPercentege = 0
 
-
+#below commented code is to assign random values to the parameters in test.csv by using Gaussian Distribution
 """
 numpy.random.seed(0)
 arrayTemp = numpy.random.normal(size = 60, loc = 60, scale =30)
@@ -77,6 +75,8 @@ while rentCol < 60:
 df.to_csv("test.csv", index=False)
 """
 
+
+#Read flight data from flight csv
 count = 0
 with open('flight.csv', 'r') as file:
     reader = csv.reader(file)
@@ -86,18 +86,7 @@ with open('flight.csv', 'r') as file:
             tempFlight = flight(row[0], row[2], row[1], row[3], row[4], None, row[5], row[6])
             Flights.append(tempFlight)
 
-
-def change_to_hours(number):
-    temp = numpy.fix(number)
-    temp2 = number - temp
-    temp3 = temp2
-    if temp2 >= 0.6:
-        temp3 = temp2 - 0.6
-        print(temp3)
-        number = temp - 1 + temp3
-    print(number)
-pass
-
+#Function to assign flights to planes
 def assign_flight(plane, flight):
     plane.flight = flight
     flight.plane = plane
@@ -109,6 +98,7 @@ def assign_flight(plane, flight):
 pass
 
 
+#Free planes from assigned flight
 def free_plane(plane, flight):
     plane.place = flight.leavingPlace
     flight.plane = None
@@ -122,6 +112,8 @@ def free_plane(plane, flight):
 pass
 
 
+
+#creates number of planes with the given count
 def create_randomPlanes(planeCount):
     i = 0
     while i < planeCount:
@@ -131,6 +123,8 @@ def create_randomPlanes(planeCount):
     return i
 pass
 
+
+#helper function to find the time difference between leaving and arrival time of a plane in MINUTES
 def addToTotalFlightHour(leave,arrive):
     number_dec = leave % 1
     number_dec2 = arrive % 1
@@ -151,18 +145,24 @@ def addToTotalFlightHour(leave,arrive):
     return totalFlightHours
 
 
+#Function which performs 7 days of simulation
+"""""
+Notes:
+-Assigns planes to flights
+-Frees planes when the flight is over
+"""""
 def schedule_flights(args, args2):
 
-    for d in Days:
+    for d in Days:                               #days
         currentDate = d
         hour = 0
         counter = 0
         time = 0
         tempString = f"{currentDate}"
         printOut.append(tempString)
-        while hour < 24:
+        while hour < 24:                         #hours
             minute = 0
-            while minute < 60:
+            while minute < 60:                   #minutes
                 minute = minute + 1
                 if minute == 60:
                     break
@@ -172,12 +172,12 @@ def schedule_flights(args, args2):
                 else:
                     time = hour + (minute * (0.01))
 
-                time = round(float(time), 2)
+                time = round(float(time), 2) #current time
 
-                for a in args:
+                for a in args:         #args = flights , looks for the leaving time of flights and assigns planes to them
                     if round(float(a.leavingTime),2) == time and a.leavingDay == currentDate:
                         check = 0
-                        for x in args2:
+                        for x in args2:  #args2 = planes , looks for the free planes and assigns them to flights
                             if x.available == 1 and x.availableHour <= time and x.place == a.leavingPlace:
                                 assign_flight(x, a)
                                 check = 1
@@ -191,7 +191,7 @@ def schedule_flights(args, args2):
                                     tempString = f"time: {time} | flight name: {x.flight.name} | plane name: {x.name}  | day: {a.leavingDay} |  FLIGHT IS ASSIGNED check == 0"
                                     printOut.append(tempString)
                                     break
-
+                    #free planes when the arrival time of their flight has come
                     if round(float(a.arrivalTime),2) == time and a.arrivalDay == currentDate:
                         for x in args2:
                             if x.flight == a:
@@ -202,11 +202,15 @@ def schedule_flights(args, args2):
             hour = hour + 1
         tempString = "-----------------------------------------------------------------------------------------------------------------"
         printOut.append(tempString)
+
+    #Print out flight amount of each plane in the simulation
     for p in Planes:
         print(p.name," => ", p.flightHour,"minutes of flight")
 
-    calculatePercentage = 0
+
     print("------------------------------------------------------------------------------------------------------------------")
+    #calculates total avg percentage of the flights
+    calculatePercentage = 0
     for p in Planes:
         print(p.name,"---flight percentage---" ,(int(p.flightHour))*100/totalFlightHours)
         calculatePercentage = calculatePercentage + (int(p.flightHour))*100/totalFlightHours
@@ -216,7 +220,8 @@ def schedule_flights(args, args2):
 pass
 
 
-
+#below code is to try elasticNet algorithm for ML model.
+#the model failed with low accurancy rate
 
 """"
 
@@ -262,7 +267,7 @@ plt.legend()
 plt.show()
 """""
 
-
+#APP class is the window of the UI
 class App(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
@@ -270,6 +275,7 @@ class App(tk.Tk):
         self._frame = None
         self.switch_frame(StartPage)
 
+    #below function is used to change the view o the window, in order to change pages
     def switch_frame(self, frame_class):
         new_frame = frame_class(self)
         if self._frame is not None:
@@ -277,6 +283,8 @@ class App(tk.Tk):
         self._frame = new_frame
         self._frame.pack()
 
+
+#Starting page of the simulation
 class StartPage(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master,bg="red4")
@@ -297,25 +305,29 @@ class StartPage(tk.Frame):
 
 
 
+#Flight schedule page of the simulation
+""""
+Notes: 
+- The Page1 frame consists of 2 other sub-frames (Frame3 and Frame4)
 
-
-
-
-
-
+"""""
 class PageOne(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master)
         flightPercentege = schedule_flights(Flights, Planes)
         planeCount = 0
+
+        #calculate avg percentage of fligts for each plane
         for p in Planes:
             planeCount = planeCount + 1
         print("Average percentage of flight : ", float(round(flightPercentege/planeCount,2)))
 
-
+        #create sub-frames
         frame3 = tk.Frame(master=self, width=100,height=300, bg="red4")
-
         frame4 = tk.Frame(master=self, width=200, height=600, bg="red4")
+
+
+        #welcoming label
         greeting1_label = tk.Label(
             master=frame3,
             text="Scheduled flights of the week",
@@ -329,7 +341,6 @@ class PageOne(tk.Frame):
 
         scrollbar = Scrollbar(frame3)
         scrollbar.pack(side=RIGHT, fill=Y)
-
         listbox = Listbox(frame3, yscrollcommand=scrollbar.set)
         [listbox.insert(END, row) for row in printOut]
         listbox.config(font="Courier", fg="blue")
@@ -356,10 +367,10 @@ class PageOne(tk.Frame):
             fg="white",
             bg="red4",
         )
-
         plane_label.place(x=60, y=120)
         cb = ttk.Combobox(frame4, values=plane_names)
         cb.place(x=60, y=150)
+
 
         delay_label = tk.Label(
             master=frame4,
@@ -368,7 +379,6 @@ class PageOne(tk.Frame):
             fg="white",
             bg="red4",
         )
-
         delay_label.place(x=300, y=120)
         delay_box = tk.Text(frame4, height=1, width=30)
         delay_box.place(x=300, y=150)
@@ -385,7 +395,6 @@ class PageOne(tk.Frame):
             fg="white",
             bg="red4",
         )
-
         backupPlaneLabel.place(x=60, y=200)
         cb2 = ttk.Combobox(frame4, values=["yes","no"])
         cb2.place(x=60, y=230)
@@ -397,10 +406,9 @@ class PageOne(tk.Frame):
             fg="white",
             bg="red4",
         )
-
-        backupPlaneLabel_closest.place(x=400, y=200)
+        backupPlaneLabel_closest.place(x = 400, y = 200)
         cb3 = ttk.Combobox(frame4, values=["yes", "no"])
-        cb3.place(x=400, y=230)
+        cb3.place(x = 400, y = 230)
 
         rent_label = tk.Label(
             master=frame4,
@@ -409,19 +417,19 @@ class PageOne(tk.Frame):
             fg="white",
             bg="red4",
         )
-
         rent_label.place(x=60, y=280)
         rent_box = tk.Text(frame4, height=1, width=15)
         rent_box.place(x=60, y=310)
 
+        #below function is using Decision Tree in order to decide how to solve the problem occured in scheduling (ML)
         def fix_Schedule():
             popup = tk.Tk()
             popup.wm_title("Suggested Solution")
 
-            #get inputs to test
+            #get user inputs to predict solution
             delayAmount = int(delay_box.get("1.0",'end-1c'))
             rentAmount =  int(rent_box.get("1.0",'end-1c'))
-            #place,backup plane,delay amount,rental price,label
+
             if(cb2.get() == "yes"):
                 back_up_plane = 1
             else :
@@ -432,28 +440,30 @@ class PageOne(tk.Frame):
             else :
                 back_up_plane2 = 0
 
+            #prepare prediction data
             dataTotest = [back_up_plane2,back_up_plane,delayAmount,rentAmount]
 
             #decision tree implementation
-            # load data to decision tree
-            data = pd.read_csv("test.csv")
+
+            data = pd.read_csv("test.csv") # load data to decision tree
             col_names = ['place', 'backup plane', 'delay amount', 'rental price', 'label']
             test = pd.read_csv("test.csv")
             test.columns = col_names
             feature_cols = ['place', 'backup plane', 'delay amount', 'rental price']
-            X = test[feature_cols]  # Features
-            y = test.label  # Target label
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+            X = test[feature_cols]
+            y = test.label  #target label
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42) #split data to test/train pars
+
             clf = DecisionTreeClassifier(criterion="gini", min_samples_split=10, max_depth=3)
             clf = clf.fit(X_train, y_train)
-            arrayf = [dataTotest]
-            y_pred2 = clf.predict(arrayf)
-            y_pred = clf.predict(X_test)
 
             print("######################################################################################","\n")
             print("Accuracy of the decision treebased on the training and test data:", metrics.accuracy_score(y_test, y_pred))
             print("######################################################################################","\n")
 
+            arrayf = [dataTotest]
+            y_pred2 = clf.predict(arrayf)
+            y_pred = clf.predict(X_test)
             print(y_pred2)
             solutionLabel = y_pred2[0]
             solution = " hi"
@@ -472,6 +482,7 @@ class PageOne(tk.Frame):
                                      command=popup.destroy).pack()
 
             # Note: graphviz is not working in company pc
+            #below code is used to visualize decision tree
             """""
             dot_data = StringIO()
             export_graphviz(clf, out_file=dot_data,
@@ -494,12 +505,19 @@ class PageOne(tk.Frame):
         frame3.pack(fill=tk.BOTH, expand=True)
         frame4.pack(fill=tk.BOTH, expand=True)
 
+# Main Page of the simulation where the user indicates the number of planes in the simulation
 
+""""
+Notes: 
+- The Page2 frame consists of 2 other sub-frames (Frame2 and Frame1)
+
+"""""
 class PageTwo(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master)
+        #create sub-frames
         frame1 = tk.Frame(master=self, width=200, height=200, bg="white")
-
+        frame2 = tk.Frame(master=self, width=20, height=800, bg="red4")
 
         greeting_label = tk.Label(
             master=frame1,
@@ -512,7 +530,7 @@ class PageTwo(tk.Frame):
         )
         greeting_label.pack()
 
-        frame2 = tk.Frame(master=self, width=20, height=800, bg="red4")
+
         plane_box = Entry(frame2)
         plane_box.place(x=600, y=150)
 
@@ -554,6 +572,8 @@ class PageTwo(tk.Frame):
 if __name__ == "__main__":
 
     count = 1
+
+    #calulate total flight hour in the simulation by reading flight.csv file
     with open('flight.csv', 'r') as file:
         reader = csv.reader(file)
         for row in reader:
@@ -566,10 +586,12 @@ if __name__ == "__main__":
 
     print("TOTAL FLIGHT AMOUNT OF THE WEEK : ",totalFlightHours,"minutes")
     print("TOTAL FLIGHT AMOUNT OF THE WEEK : ",float(round(finalResultHour)),"hours",finalResultMin,"minutes")
-    # plot here
+
+
+    # below are the codes to draw a plot to see the corelation between the number of planes vs the avg time of fligts
     x1 = [2, 5, 10, 15, 20]
     y1 = [22.49, 16.33, 9.63, 6.73, 5.77]
-    # plotting the line 1 points
+
     plot.plot(x1, y1, label="avg flight time")
 
     plot.xlabel('Num. of planes')
@@ -577,6 +599,7 @@ if __name__ == "__main__":
     plot.title('Number of Planes Used vs Avg Flight Time Plot')
     plot.show()
 
+    #start running the simulation
     app = App()
     app.mainloop()
 
