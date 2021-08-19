@@ -102,7 +102,7 @@ def assign_flight(plane, flight):
     plane.flight = flight
     flight.plane = plane
     plane.place = flight.arrivalPlace
-    plane.flightHour = 2 + plane.flightHour + addToTotalFlightHour(float(flight.leavingTime),float(flight.arrivalTime))
+    plane.flightHour =  plane.flightHour + addToTotalFlightHour(float(flight.leavingTime),float(flight.arrivalTime))
     plane.available = 0
     Planes.remove(plane)
     Planes.append(plane)
@@ -138,7 +138,6 @@ def addToTotalFlightHour(leave,arrive):
     number_dec2 = round(float(number_dec2), 2)
     number = int(leave)
     number2 = int(arrive)
-
     minutes = number * 60 + number_dec*100
     minutes2 = number2 * 60 + number_dec2 * 100
 
@@ -267,6 +266,7 @@ plt.show()
 class App(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
+        self.wm_title("Flight Simulation")
         self._frame = None
         self.switch_frame(StartPage)
 
@@ -363,7 +363,7 @@ class PageOne(tk.Frame):
 
         delay_label = tk.Label(
             master=frame4,
-            text="Delay Amount (in hours):",
+            text="Delay Amount (in minutes):",
             font=("Courier", 12),
             fg="white",
             bg="red4",
@@ -415,12 +415,8 @@ class PageOne(tk.Frame):
         rent_box.place(x=60, y=310)
 
         def fix_Schedule():
-
             popup = tk.Tk()
             popup.wm_title("Suggested Solution")
-            label = ttk.Label(popup, text=inputValue)
-            label.pack(side="top", fill="x", pady=10)
-            B1 = ttk.Button(popup, text=("Okay"), command=popup.destroy)
 
             #get inputs to test
             delayAmount = int(delay_box.get("1.0",'end-1c'))
@@ -428,39 +424,55 @@ class PageOne(tk.Frame):
             #place,backup plane,delay amount,rental price,label
             if(cb2.get() == "yes"):
                 back_up_plane = 1
+                print("hi")
             else :
+
                 back_up_plane = 0
 
             if(cb3.get() == "yes"):
+                print("hi")
                 back_up_plane2 = 1
             else :
                 back_up_plane2 = 0
 
             dataTotest = [back_up_plane2,back_up_plane,delayAmount,rentAmount]
 
-
+            #decision tree implementation
             # load data to decision tree
             data = pd.read_csv("test.csv")
             col_names = ['place', 'backup plane', 'delay amount', 'rental price', 'label']
             test = pd.read_csv("test.csv")
             test.columns = col_names
-
             feature_cols = ['place', 'backup plane', 'delay amount', 'rental price']
             X = test[feature_cols]  # Features
             y = test.label  # Target label
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
-
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
             clf = DecisionTreeClassifier(criterion="gini", min_samples_split=10, max_depth=3)
             clf = clf.fit(X_train, y_train)
-            #######################################################################################COME BAAAAAAAAAAACCCCCCCCCCKKKKKKKKKK###########
             arrayf = [dataTotest]
             y_pred2 = clf.predict(arrayf)
-            print(y_pred2)
-            #######################################################################################COME BAAAAAAAAAAACCCCCCCCCCKKKKKKKKKK###########
             y_pred = clf.predict(X_test)
+
             print("######################################################################################","\n")
             print("Accuracy of the decision treebased on the training and test data:", metrics.accuracy_score(y_test, y_pred))
             print("######################################################################################","\n")
+
+            print(y_pred2)
+            solutionLabel = y_pred2[0]
+            solution = " hi"
+            if solutionLabel == 0:
+                solution = "The problem requires no solution"
+            if solutionLabel == 1:
+                solution = " Offered solution is to use backup plane"
+            if solutionLabel == 2:
+                solution = " Offered solution is to rent another firm's plane "
+            if solutionLabel == 3:
+                solution = " Offered solution is to assign another plane from a close place "
+
+            label = tk.Label(popup, text=solution,bg="red4",fg="lightblue1",font=("Courier"))
+            label.pack(side="top", fill=BOTH, pady=10)
+            button_okey = tk.Button(popup,text="Okay!", bg="DodgerBlue4",fg="lightblue1",font=("Courier"),
+                                     command=popup.destroy).pack()
 
             # Note: graphviz is not working in company pc
             """""
@@ -545,18 +557,18 @@ class PageTwo(tk.Frame):
 
 if __name__ == "__main__":
 
-    count = 0
+    count = 1
     with open('flight.csv', 'r') as file:
         reader = csv.reader(file)
         for row in reader:
-            count = count + 1
             if count != 1:
                 totalFlightHours = totalFlightHours + addToTotalFlightHour(float(row[1]),float(row[2]))
+            count = count + 1
 
     finalResultHour = totalFlightHours / 60
     finalResultMin = totalFlightHours % 60
 
-    print("TOTAL FLIGHT AMOUNT OF THE WEEK : ",totalFlightHours)
+    print("TOTAL FLIGHT AMOUNT OF THE WEEK : ",totalFlightHours,"minutes")
     print("TOTAL FLIGHT AMOUNT OF THE WEEK : ",float(round(finalResultHour)),"hours",finalResultMin,"minutes")
     # plot here
     x1 = [2, 5, 10, 15, 20]
