@@ -218,45 +218,9 @@ pass
 
 
 
-# load data to decision tree
-data = pd.read_csv("test.csv")
-col_names = ['place','backup plane','delay amount','rental price','label']
-test = pd.read_csv("test.csv")
-test.columns = col_names
-
-feature_cols = ['place','backup plane','delay amount','rental price']
-X = test[feature_cols] # Features
-y = test.label         # Target label
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-
-clf = DecisionTreeClassifier(criterion="gini",min_samples_split=10,max_depth=3)
-clf = clf.fit(X_train,y_train)
-#######################################################################################COME BAAAAAAAAAAACCCCCCCCCCKKKKKKKKKK###########
-testtt = [2,3,4,5]
-testtt2 = [1,0,80,12859]
-arrayf =[testtt]
-y_pred2 = clf.predict(arrayf)
-print(y_pred2)
-
-#######################################################################################COME BAAAAAAAAAAACCCCCCCCCCKKKKKKKKKK###########
-y_pred = clf.predict(X_test)
-print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
-
-y_pred = clf.predict(X_test)
-dot_data = StringIO()
-
-# Note: graphviz is not working in company pc
-"""""
-export_graphviz(clf, out_file=dot_data,
-                filled=True, rounded=True,
-                special_characters=True,feature_names = feature_cols,class_names=['0','1','2','3'])
-graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
-graph.write_png('test.png')
-Image(graph.create_png())
-
-"""""
 
 """"
+
 elastic=ElasticNet(alpha=0.5, l1_ratio=0.1, fit_intercept=True, normalize=False, precompute=False, max_iter=1000, copy_X=True, tol=0.0001, warm_start=False, positive=False, random_state=None,).fit(X_train,y_train)
 y_pred = elastic.predict(X_test)
 score = elastic.score(X_test, y_test)
@@ -331,6 +295,14 @@ class StartPage(tk.Frame):
 
 
 
+
+
+
+
+
+
+
+
 class PageOne(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master)
@@ -380,7 +352,7 @@ class PageOne(tk.Frame):
         plane_label = tk.Label(
             master=frame4,
             text="Plane name:",
-            font=("Courier", 16),
+            font=("Courier", 12),
             fg="white",
             bg="red4",
         )
@@ -392,16 +364,125 @@ class PageOne(tk.Frame):
         delay_label = tk.Label(
             master=frame4,
             text="Delay Amount (in hours):",
-            font=("Courier", 16),
+            font=("Courier", 12),
             fg="white",
             bg="red4",
         )
+
         delay_label.place(x=300, y=120)
         delay_box = tk.Text(frame4, height=1, width=30)
         delay_box.place(x=300, y=150)
+
         back_button =tk.Button(master=frame4, text="Back to main page", command=lambda:master.switch_frame(PageTwo), height = 2,
-                                    width=30,fg="white", bg="DodgerBlue4", font="Courier")
-        back_button.place(x=1050, y=280)
+                                    width=20,fg="white", bg="DodgerBlue4", font="Courier")
+        back_button.place(x=1200, y=350)
+
+
+        backupPlaneLabel= tk.Label(
+            master=frame4,
+            text="Are there any back up planes?",
+            font=("Courier", 12),
+            fg="white",
+            bg="red4",
+        )
+
+        backupPlaneLabel.place(x=60, y=200)
+        cb2 = ttk.Combobox(frame4, values=["yes","no"])
+        cb2.place(x=60, y=230)
+
+        backupPlaneLabel_closest= tk.Label(
+            master=frame4,
+            text="Are there any back up planes in close areas?",
+            font=("Courier", 12),
+            fg="white",
+            bg="red4",
+        )
+
+        backupPlaneLabel_closest.place(x=400, y=200)
+        cb3 = ttk.Combobox(frame4, values=["yes", "no"])
+        cb3.place(x=400, y=230)
+
+        rent_label = tk.Label(
+            master=frame4,
+            text="Enter the rental cost.",
+            font=("Courier", 12),
+            fg="white",
+            bg="red4",
+        )
+
+        rent_label.place(x=60, y=280)
+        rent_box = tk.Text(frame4, height=1, width=15)
+        rent_box.place(x=60, y=310)
+
+        def fix_Schedule():
+
+            popup = tk.Tk()
+            popup.wm_title("Suggested Solution")
+            label = ttk.Label(popup, text=inputValue)
+            label.pack(side="top", fill="x", pady=10)
+            B1 = ttk.Button(popup, text=("Okay"), command=popup.destroy)
+
+            #get inputs to test
+            delayAmount = int(delay_box.get("1.0",'end-1c'))
+            rentAmount =  int(rent_box.get("1.0",'end-1c'))
+            #place,backup plane,delay amount,rental price,label
+            if(cb2.get() == "yes"):
+                back_up_plane = 1
+            else :
+                back_up_plane = 0
+
+            if(cb3.get() == "yes"):
+                back_up_plane2 = 1
+            else :
+                back_up_plane2 = 0
+
+            dataTotest = [back_up_plane2,back_up_plane,delayAmount,rentAmount]
+
+
+            # load data to decision tree
+            data = pd.read_csv("test.csv")
+            col_names = ['place', 'backup plane', 'delay amount', 'rental price', 'label']
+            test = pd.read_csv("test.csv")
+            test.columns = col_names
+
+            feature_cols = ['place', 'backup plane', 'delay amount', 'rental price']
+            X = test[feature_cols]  # Features
+            y = test.label  # Target label
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
+
+            clf = DecisionTreeClassifier(criterion="gini", min_samples_split=10, max_depth=3)
+            clf = clf.fit(X_train, y_train)
+            #######################################################################################COME BAAAAAAAAAAACCCCCCCCCCKKKKKKKKKK###########
+            arrayf = [dataTotest]
+            y_pred2 = clf.predict(arrayf)
+            print(y_pred2)
+            #######################################################################################COME BAAAAAAAAAAACCCCCCCCCCKKKKKKKKKK###########
+            y_pred = clf.predict(X_test)
+            print("######################################################################################","\n")
+            print("Accuracy of the decision treebased on the training and test data:", metrics.accuracy_score(y_test, y_pred))
+            print("######################################################################################","\n")
+
+            # Note: graphviz is not working in company pc
+            """""
+            dot_data = StringIO()
+            export_graphviz(clf, out_file=dot_data,
+                            filled=True, rounded=True,
+                            special_characters=True,feature_names = feature_cols,class_names=['0','1','2','3'])
+            graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
+            graph.write_png('test.png')
+            Image(graph.create_png())
+
+
+            B1.pack()
+            popup.mainloop
+            """""
+
+        fix_button = tk.Button(master=frame4, text="Fix Schedule",
+                                command=lambda: fix_Schedule(),
+                                height=1,
+                                width=18, fg="white", bg="DodgerBlue4", font="Courier")
+        fix_button.place(x=60, y=350)
+
         frame3.pack(fill=tk.BOTH, expand=True)
         frame4.pack(fill=tk.BOTH, expand=True)
 
@@ -459,6 +540,8 @@ class PageTwo(tk.Frame):
         button_schedule.pack(pady=30)
 
         frame2.pack(fill=tk.BOTH, side=tk.BOTTOM, expand=True)
+
+
 
 if __name__ == "__main__":
 
