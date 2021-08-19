@@ -105,7 +105,7 @@ def free_plane(plane, flight):
     plane.place = flight.leavingPlace
     flight.plane = None
     plane.availableHour = 2 + float(flight.arrivalTime)
-    if (plane.availableHour >= 24):
+    if plane.availableHour >= 24:
         plane.availableHour = plane.availableHour - 24
         plane.availableHour = round(float(plane.availableHour), 2)
 
@@ -139,7 +139,7 @@ def addToTotalFlightHour(leave, arrive):
     minutes = number * 60 + number_dec * 100
     minutes2 = number2 * 60 + number_dec2 * 100
 
-    if (arrive > leave):
+    if arrive > leave:
         totalFlightHours = (minutes2 - minutes)
 
     else:
@@ -212,22 +212,20 @@ def schedule_flights(args, args2):
     for p in Planes:
         print(p.name, " => ", p.flightHour, "minutes of flight")
 
-    print("------------------------------------------------------------------------------------------------------------------")
+    print(
+        "------------------------------------------------------------------------------------------------------------------")
 
-
-    # calculates total avg percentage of the flights
+    # Calculates total avg percentage of the flights
     calculatePercentage = 0
     for p in Planes:
         print(p.name, "---flight percentage---", (int(p.flightHour)) * 100 / totalFlightHours)
         calculatePercentage = calculatePercentage + (int(p.flightHour)) * 100 / totalFlightHours
-
     return calculatePercentage
-
 
 pass
 
 # below code is to try elasticNet algorithm for ML model.
-# the model failed with low accurency rate
+# the model failed with low accuracy rate
 
 """"
 
@@ -253,7 +251,6 @@ plt.show()
 
 def n_alpha(args):
     pass
-
 
 elastic_cv=ElasticNetCV(alphas=alphas, cv=5)
 model = elastic_cv.fit(X_train, y_train)
@@ -290,9 +287,12 @@ class App(tk.Tk):
         self._frame = new_frame
         self._frame.pack()
 
+
 """""
 Class of the Starting page of the simulation
 """""
+
+
 class StartPage(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master, bg="red4")
@@ -316,13 +316,15 @@ Class of the Flight schedule page of the simulation
 Notes: 
 - The Page1 frame consists of 2 other sub-frames (Frame3 and Frame4)
 """""
+
+
 class PageOne(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master)
         flightPercentage = schedule_flights(Flights, Planes)
         planeCount = 0
 
-        # calculate avg percentage of fligts for each plane
+        # calculate avg percentage of flights for each plane
         for p in Planes:
             planeCount = planeCount + 1
         print("Average percentage of flight : ", float(round(flightPercentage / planeCount, 2)))
@@ -432,18 +434,18 @@ class PageOne(tk.Frame):
             delayAmount = int(delay_box.get("1.0", 'end-1c'))
             rentAmount = int(rent_box.get("1.0", 'end-1c'))
 
-            if (cb2.get() == "yes"):
+            if cb2.get() == "yes":
                 back_up_plane = 1
             else:
                 back_up_plane = 0
 
-            if (cb3.get() == "yes"):
+            if cb3.get() == "yes":
                 back_up_plane2 = 1
             else:
                 back_up_plane2 = 0
 
             # prepare prediction data
-            dataTotest = [back_up_plane2, back_up_plane, delayAmount, rentAmount]
+            dataToTest = [back_up_plane2, back_up_plane, delayAmount, rentAmount]
 
             # decision tree implementation
 
@@ -461,16 +463,16 @@ class PageOne(tk.Frame):
             clf = clf.fit(X_train, y_train)
 
             y_pred = clf.predict(X_test)
-            print("######################################################################################", "\n")
+            print("_______________________________________________________________________________________________________", "\n")
             print("Accuracy of the decision tree based on the training and test data:",
                   metrics.accuracy_score(y_test, y_pred))
-            print("######################################################################################", "\n")
+            print("_______________________________________________________________________________________________________", "\n")
 
-            arrayf = [dataTotest]
+            arrayf = [dataToTest]
             y_pred2 = clf.predict(arrayf)
-            print(y_pred2)
-            solutionLabel = y_pred2[0]
-            solution = " hi"
+            solutionLabel = y_pred2[0] # y_pred2 is the prdiction array, there is only one prediction therefore the label is in the index 0
+
+            solution = ""
             if solutionLabel == 0:
                 solution = "The problem requires no solution"
             if solutionLabel == 1:
@@ -486,7 +488,7 @@ class PageOne(tk.Frame):
                                     command=popup.destroy).pack()
 
             # Note: graphviz is not working in company pc
-            # below code is used to visualize decision tree
+            # Below code is used to visualize decision tree
             """""
             dot_data = StringIO()
             export_graphviz(clf, out_file=dot_data,
@@ -536,7 +538,7 @@ class PageTwo(tk.Frame):
         plane_box = Entry(frame2)
         plane_box.place(x=600, y=150)
 
-        #below function is used to retrive user input in button press
+        # below function is used to retrive user input in button press
         def retrieve_input():
             inputValue = int(plane_box.get())
             create_randomPlanes(inputValue)
@@ -571,11 +573,12 @@ class PageTwo(tk.Frame):
         frame2.pack(fill=tk.BOTH, side=tk.BOTTOM, expand=True)
 
 
+
 if __name__ == "__main__":
 
     count = 1
+    # Calculate total flight hour in the simulation by reading flight.csv file
 
-    #Calculate total flight hour in the simulation by reading flight.csv file
     with open('flight.csv', 'r') as file:
         reader = csv.reader(file)
         for row in reader:
@@ -589,7 +592,7 @@ if __name__ == "__main__":
     print("TOTAL FLIGHT AMOUNT OF THE WEEK : ", totalFlightHours, "minutes")
     print("TOTAL FLIGHT AMOUNT OF THE WEEK : ", float(round(finalResultHour)), "hours", finalResultMin, "minutes")
 
-    # below are the codes to draw a plot to see the corelation between the number of planes vs the avg time of fligts
+    # below are the codes to draw a plot to see the correlation between the number of planes vs the avg time of flights
     x1 = [2, 5, 10, 15, 20]
     y1 = [22.49, 16.33, 9.63, 6.73, 5.77]
 
